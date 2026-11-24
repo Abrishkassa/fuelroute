@@ -36,12 +36,14 @@ def normalize_city(name: str) -> str:
 
 
 def load_city_index(path) -> dict:
-    """{(normalized_city, STATE): (lat, lng)} from the US cities CSV."""
-    index = dict(MANUAL_COORDS)
+    """{(normalized_city, STATE): (lat, lng, display_name)} from the US cities CSV."""
+    names = {"brookpark": "Brook Park", "elizabethport": "Elizabethport", "evergreen": "Evergreen",
+             "henrico": "Henrico", "portwentworth": "Port Wentworth", "universitypark": "University Park"}
+    index = {k: (v[0], v[1], names[k[0]]) for k, v in MANUAL_COORDS.items()}
     with open(path, encoding="utf-8-sig", newline="") as f:
         for row in csv.DictReader(f):
             key = (normalize_city(row["CITY"]), row["STATE_CODE"])
-            index.setdefault(key, (float(row["LATITUDE"]), float(row["LONGITUDE"])))
+            index.setdefault(key, (float(row["LATITUDE"]), float(row["LONGITUDE"]), row["CITY"]))
     return index
 
 

@@ -20,3 +20,16 @@ class Station(models.Model):
 
     def __str__(self):
         return f"{self.name} ({self.city}, {self.state}) ${self.price:.3f}"
+
+
+class City(models.Model):
+    """US city centroid, used to turn 'Dallas, TX' into coordinates without an API call."""
+
+    key = models.CharField(max_length=120)  # normalized name, see ingest.normalize_city
+    name = models.CharField(max_length=120)
+    state = models.CharField(max_length=2)
+    latitude = models.FloatField()
+    longitude = models.FloatField()
+
+    class Meta:
+        constraints = [models.UniqueConstraint(fields=["key", "state"], name="uniq_city_key_state")]

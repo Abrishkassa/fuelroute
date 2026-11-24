@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
     'stations',
 ]
 
@@ -145,3 +146,7 @@ ROUTING_TIMEOUT = 15
 CITIES_CSV_URL = (
     "https://raw.githubusercontent.com/kelvins/US-Cities-Database/main/csv/us_cities.csv"
 )
+CORRIDOR_MILES = 10  # stations are city-level points, so allow some slack off the highway
+TRIP_CACHE_SECONDS = 3600
+REST_FRAMEWORK = {'DEFAULT_RENDERER_CLASSES': ['rest_framework.renderers.JSONRenderer']}
+MIN_SAVINGS_PER_GALLON = 0.05  # a station must be 5c/gal cheaper to be worth chasing; see README

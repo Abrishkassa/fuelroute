@@ -5,7 +5,7 @@ from django.conf import settings
 from django.core.management.base import BaseCommand
 
 from stations.ingest import clean_stations, load_city_index
-from stations.models import Station
+from stations.models import City, Station
 
 
 class Command(BaseCommand):
@@ -23,7 +23,13 @@ class Command(BaseCommand):
             resp.raise_for_status()
             cities_path.write_bytes(resp.content)
 
-        rows, stats = clean_stations(opts["csv"], load_city_index(cities_path))
+        city_index = load_city_index(cities_path)
+        City.objects.bulk_create(
+            [City(key=k, name=name, state=st, latitude=lat, longitude=lng) for (k, st), (lat, lng, name) in city_index.items()],
+            batch_size=2000, update_conflicts=True, unique_fields=["key", "state"],
+            update_fields=["name", "latitude", "longitude"],
+        )
+        rows, stats = clean_stations(opts["csv"], city_index)
         Station.objects.bulk_create(
             [Station(**r) for r in rows],
             batch_size=1000,

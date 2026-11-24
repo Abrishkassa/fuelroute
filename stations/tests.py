@@ -15,7 +15,7 @@ CSV = (
     "2,CANADIAN STOP,HWY 1,Calgary,AB,1,4.5\r\n"
     "3,ST LOUIS STOP,I-70,St. Louis,MO,2,3.2\r\n"
 )
-CITY_INDEX = {("gilabend", "AZ"): (32.95, -112.72), ("saintlouis", "MO"): (38.63, -90.2)}
+CITY_INDEX = {("gilabend", "AZ"): (32.95, -112.72, "Gila Bend"), ("saintlouis", "MO"): (38.63, -90.2, "St. Louis")}
 
 
 class CleaningTests(SimpleTestCase):
