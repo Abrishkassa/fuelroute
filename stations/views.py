@@ -1,3 +1,4 @@
+from django.shortcuts import render
 from rest_framework import serializers, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -32,3 +33,8 @@ class RouteView(APIView):
             return Response({"error": str(exc)}, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
         except RoutingError as exc:
             return Response({"error": str(exc)}, status=status.HTTP_502_BAD_GATEWAY)
+
+
+def map_page(request):
+    """Small Leaflet UI that calls /api/route/ and draws the route and fuel stops."""
+    return render(request, "stations/map.html")

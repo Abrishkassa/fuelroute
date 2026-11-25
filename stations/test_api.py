@@ -77,3 +77,11 @@ class RouteApiTests(TestCase):
         cache.clear()
         r = self.client.get("/api/route/", {"start": "Alpha, TX", "finish": "Omega, TX"})
         self.assertEqual(r.status_code, 422)
+
+
+class MapPageTests(SimpleTestCase):
+    def test_root_serves_map_page(self):
+        resp = self.client.get("/")
+        self.assertEqual(resp.status_code, 200)
+        self.assertContains(resp, "Fuel Route Planner")
+        self.assertContains(resp, "/api/route/")

@@ -4,3 +4,5 @@ __pycache__/
 db.sqlite3
 data/us_cities.csv
 .env
+
+.postman/

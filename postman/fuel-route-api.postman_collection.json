@@ -1,0 +1,396 @@
+{
+  "info": {
+    "name": "Fuel Route API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Run the Django server first (python manage.py runserver). Each request has tests; use the Collection Runner."
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://127.0.0.1:8000"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Dallas -> Atlanta (first call hits routing API)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"200 OK\", () => pm.response.to.have.status(200));",
+              "const d = pm.response.json();",
+              "pm.test(\"gallons = distance / 10\", () => pm.expect(d.total_gallons).to.be.closeTo(d.distance_miles / 10, 0.1));",
+              "pm.test(\"has route geometry + stops + cost\", () => { pm.expect(d.route.geometry.type).to.eql(\"LineString\"); pm.expect(d.fuel_stops).to.be.an(\"array\"); pm.expect(d.total_fuel_cost).to.be.above(0); });",
+              "pm.test(\"stops are within tank range of each other\", () => { const m = d.fuel_stops.map(s => s.mile_marker); for (let i = 1; i < m.length; i++) pm.expect(m[i] - m[i-1]).to.be.below(500); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "description": "",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/route/?start=Dallas, TX&finish=Atlanta, GA",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "route",
+            ""
+          ],
+          "query": [
+            {
+              "key": "start",
+              "value": "Dallas, TX"
+            },
+            {
+              "key": "finish",
+              "value": "Atlanta, GA"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "2. Same trip again (served from cache)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"200 OK\", () => pm.response.to.have.status(200));",
+              "const d = pm.response.json();",
+              "pm.test(\"gallons = distance / 10\", () => pm.expect(d.total_gallons).to.be.closeTo(d.distance_miles / 10, 0.1));",
+              "pm.test(\"has route geometry + stops + cost\", () => { pm.expect(d.route.geometry.type).to.eql(\"LineString\"); pm.expect(d.fuel_stops).to.be.an(\"array\"); pm.expect(d.total_fuel_cost).to.be.above(0); });",
+              "pm.test(\"stops are within tank range of each other\", () => { const m = d.fuel_stops.map(s => s.mile_marker); for (let i = 1; i < m.length; i++) pm.expect(m[i] - m[i-1]).to.be.below(500); });",
+              "pm.test(\"fast (cached)\", () => pm.expect(pm.response.responseTime).to.be.below(300));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "description": "",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/route/?start=Dallas, TX&finish=Atlanta, GA",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "route",
+            ""
+          ],
+          "query": [
+            {
+              "key": "start",
+              "value": "Dallas, TX"
+            },
+            {
+              "key": "finish",
+              "value": "Atlanta, GA"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "3. Long trip: Los Angeles -> New York",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"200 OK\", () => pm.response.to.have.status(200));",
+              "const d = pm.response.json();",
+              "pm.test(\"gallons = distance / 10\", () => pm.expect(d.total_gallons).to.be.closeTo(d.distance_miles / 10, 0.1));",
+              "pm.test(\"has route geometry + stops + cost\", () => { pm.expect(d.route.geometry.type).to.eql(\"LineString\"); pm.expect(d.fuel_stops).to.be.an(\"array\"); pm.expect(d.total_fuel_cost).to.be.above(0); });",
+              "pm.test(\"stops are within tank range of each other\", () => { const m = d.fuel_stops.map(s => s.mile_marker); for (let i = 1; i < m.length; i++) pm.expect(m[i] - m[i-1]).to.be.below(500); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "description": "",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/route/?start=Los Angeles, CA&finish=New York, NY",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "route",
+            ""
+          ],
+          "query": [
+            {
+              "key": "start",
+              "value": "Los Angeles, CA"
+            },
+            {
+              "key": "finish",
+              "value": "New York, NY"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "4. Coordinates as input",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"200 OK\", () => pm.response.to.have.status(200));",
+              "const d = pm.response.json();",
+              "pm.test(\"gallons = distance / 10\", () => pm.expect(d.total_gallons).to.be.closeTo(d.distance_miles / 10, 0.1));",
+              "pm.test(\"has route geometry + stops + cost\", () => { pm.expect(d.route.geometry.type).to.eql(\"LineString\"); pm.expect(d.fuel_stops).to.be.an(\"array\"); pm.expect(d.total_fuel_cost).to.be.above(0); });",
+              "pm.test(\"stops are within tank range of each other\", () => { const m = d.fuel_stops.map(s => s.mile_marker); for (let i = 1; i < m.length; i++) pm.expect(m[i] - m[i-1]).to.be.below(500); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "description": "Seattle to Denver using lat,lng for the start.",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/route/?start=47.6062,-122.3321&finish=Denver, CO",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "route",
+            ""
+          ],
+          "query": [
+            {
+              "key": "start",
+              "value": "47.6062,-122.3321"
+            },
+            {
+              "key": "finish",
+              "value": "Denver, CO"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "5. Short trip, no stops needed (Dallas -> Austin)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"200 OK\", () => pm.response.to.have.status(200));",
+              "pm.test(\"no stops under 500 miles\", () => pm.expect(pm.response.json().fuel_stops).to.have.lengthOf(0));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "description": "",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/route/?start=Dallas, TX&finish=Austin, TX",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "route",
+            ""
+          ],
+          "query": [
+            {
+              "key": "start",
+              "value": "Dallas, TX"
+            },
+            {
+              "key": "finish",
+              "value": "Austin, TX"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "6. Low starting fuel forces an early stop",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"200 or 422\", () => pm.expect([200, 422]).to.include(pm.response.code));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "description": "",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/route/?start=Dallas, TX&finish=Austin, TX&start_fuel_miles=100",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "route",
+            ""
+          ],
+          "query": [
+            {
+              "key": "start",
+              "value": "Dallas, TX"
+            },
+            {
+              "key": "finish",
+              "value": "Austin, TX"
+            },
+            {
+              "key": "start_fuel_miles",
+              "value": "100"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "7. Error: unknown city",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"400\", () => pm.response.to.have.status(400));",
+              "pm.test(\"clear error message\", () => pm.expect(Object.keys(pm.response.json()).length).to.be.above(0));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "description": "",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/route/?start=Nowhereville, TX&finish=Atlanta, GA",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "route",
+            ""
+          ],
+          "query": [
+            {
+              "key": "start",
+              "value": "Nowhereville, TX"
+            },
+            {
+              "key": "finish",
+              "value": "Atlanta, GA"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "8. Error: missing finish",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"400\", () => pm.response.to.have.status(400));",
+              "pm.test(\"clear error message\", () => pm.expect(Object.keys(pm.response.json()).length).to.be.above(0));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "description": "",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/route/?start=Dallas, TX",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "route",
+            ""
+          ],
+          "query": [
+            {
+              "key": "start",
+              "value": "Dallas, TX"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "9. Error: location outside the USA (London)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"400\", () => pm.response.to.have.status(400));",
+              "pm.test(\"clear error message\", () => pm.expect(Object.keys(pm.response.json()).length).to.be.above(0));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "description": "",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/route/?start=51.5074,-0.1278&finish=Atlanta, GA",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "route",
+            ""
+          ],
+          "query": [
+            {
+              "key": "start",
+              "value": "51.5074,-0.1278"
+            },
+            {
+              "key": "finish",
+              "value": "Atlanta, GA"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}
