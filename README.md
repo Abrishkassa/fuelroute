@@ -8,7 +8,8 @@ A small Leaflet page at `/` draws the route and stops on a map.
 ```bash
 python -m venv venv && source venv/bin/activate        # Windows: venv\Scripts\activate
 pip install -r requirements.txt
-# Optional PostgreSQL (SQLite is the zero-setup default):
+# Optional PostgreSQL (SQLite is the zero-setup default). Verified on PostgreSQL 16;
+# the docker-compose file is provided for convenience:
 #   docker compose up -d
 #   export POSTGRES_DB=fuelroute POSTGRES_USER=postgres POSTGRES_PASSWORD=postgres
 python manage.py migrate
