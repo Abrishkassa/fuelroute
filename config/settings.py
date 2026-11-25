@@ -150,3 +150,5 @@ CORRIDOR_MILES = 10  # stations are city-level points, so allow some slack off t
 TRIP_CACHE_SECONDS = 3600
 REST_FRAMEWORK = {'DEFAULT_RENDERER_CLASSES': ['rest_framework.renderers.JSONRenderer']}
 MIN_SAVINGS_PER_GALLON = 0.05  # a station must be 5c/gal cheaper to be worth chasing; see README
+
+SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
